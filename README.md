@@ -326,6 +326,22 @@ images 폴더 안에 화면캡춰 이미지 삽입
 - [x] 바인드 마운트 반영
 - [x] 볼륨 영속성
 - [x] Git 설정 + VSCode GitHub 연동
+```zsh
+# 1. 프로젝트 최상위 폴더로 이동합니다.
+cd ~/Documents/codyssey/codyssey-e1-1
+
+# 2. 새로 추가한 이미지 파일과 수정된 README.md가 상태에 뜨는지 확인합니다.
+git status
+
+# 3. 변경된 모든 파일(이미지 포함)을 스테이징 영역에 추가합니다.
+git add .
+
+# 4. 오늘 전체 과정을 마무리하는 커밋 메시지를 작성합니다.
+git commit -m "Docs: Complete Mission E1-1 report with screenshots and troubleshooting logs"
+
+# 5. GitHub 원격 저장소로 최종 전송합니다.
+git push origin main
+```
 
 
 
