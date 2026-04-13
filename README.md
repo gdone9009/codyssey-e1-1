@@ -19,9 +19,28 @@
 - [x] hello-world 실행
 - [x] Dockerfile 빌드/실행
 - [x] 포트 매핑 접속(2회)
-- [ ] 바인드 마운트 반영
-- [ ] 볼륨 영속성
-- [ ] Git 설정 + VSCode GitHub 연동
+- [x] 바인드 마운트 반영
+- [x] 볼륨 영속성
+- [x] Git 설정 + VSCode GitHub 연동
+
+## 4. 프로젝트 구조
+
+```bash
+.
+├── images
+│   ├── Screenshot 2026-04-03 at 12.54.52 PM.png
+│   ├── volumesuccess.png
+│   └── bindmountsuccess.png
+└── practice
+    └── run_bonus_git.sh
+Dockerfile
+README.md
+hello.txt
+index.html
+
+```
+
+
 
  ## 3) 수행 로그(발췌)
 
@@ -55,6 +74,7 @@ Terminal Practice
 ````
 
 ### 02 권한 변경 실습
+권한은 읽기(4), 쓰기(2), 실행(1)의 합
 
 
 ```bash
@@ -252,6 +272,8 @@ $ docker rm -f $(docker ps -aq)
 
 ```
 ### Dockerfile 빌드/실행
+빌드(Build): Dockerfile을 통해 생성된 이미지는 애플리케이션 실행에 필요한 모든 환경이 압축된 '읽기 전용(Read-Only)' 설계도
+실행(Run): 이 이미지를 기반으로 메모리 위에 생성된 실체가 컨테이너입니다. 이미지가 클래스라면 컨테이너는 인스턴스
 
 ```zsh
 $ echo "<h1>Welcome to GangdongOne's Web Server</h1>" > index.html
@@ -321,12 +343,14 @@ CONTAINER ID   IMAGE        COMMAND                  CREATED         STATUS     
 
 ### 포트 매핑 접속(2회)
 
+Docker 컨테이너는 호스트와 격리된 가상 네트워크 내부 IP. 브라우저에서는 컨테이너 내부 네트워크에 직접 접근할 경로가 없으므로, 호스트의 특정 포트를 컨테이너의 포트와 연결하는 포트 포워딩(Port Forwarding)이 있어야만 외부 통신이 가능
+
 images 폴더 안에 화면캡춰 이미지 삽입
 
 <img src="images/Screenshot 2026-04-03 at 12.54.52 PM.png" alt="접속 결과" width="600">
 
 ### 바인드 마운트 반영
-
+컨테이너 삭제 시 데이터가 사라지는 문제를 방지하기 위해 Docker Volume과 Bind Mount를 사용
 
 ```zsh
 
@@ -350,6 +374,8 @@ docker rm -f my-web-server
 
 
 ### 볼륨 영속성
+컨테이너 삭제 시 데이터가 사라지는 문제를 방지하기 위해 Docker Volume과 Bind Mount를 사용
+
 ```zsh
 docker volume create my-web-data
 docker volume ls
@@ -403,7 +429,10 @@ git push origin main
 
 ### 트러블슈핑
 컨테이너가 이미 실행중일때, 1.기존 컨테이너를 삭제하거나, 이름을 바꾼다. 2.새로운 이름의 컨테이너를 새로운 포트매팅으로 만들다.
-
+1. docker ps로 이미 실행 중인 컨테이너가 해당 포트를 점유 중인지 확인
+2. lsof -i :8080 명령으로 도커 외의 다른 호스트 프로세스가 포트를 사용 중인지 진단
+3. 충돌하는 프로세스를 종료(kill)하거나, 기존 컨테이너를 삭제(rm -f)
+4. 
 ```zsh
 $ docker run -d -p 8080:80 --name my-web-server my-web:1.0 
 docker: Error response from daemon: Conflict. The container name "/my-web-server" is already in use by container "72efead3e43c35aa8f586838395394fd5588991f107cfa5c5a75db9e55568004". You have to remove (or rename) that container to be able to reuse that name.
