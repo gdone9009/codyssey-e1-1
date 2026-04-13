@@ -436,11 +436,12 @@ CONTAINER ID   IMAGE        COMMAND                  CREATED              STATUS
 두번째 트러블슈팅
 전체 명령어를 감싸는 따옴표를 홀따옴표(' ')로 바꾸어서 해결
 
-'''zsh
+```zsh
 
 # 1. 컨테이너 내부 파일 수정 (임시로 문구 변경)
 docker exec -it my-web-v3 sh -c "echo '<h1>Volume Persistence Success!</h1>' > /usr/share/nginx/html/index.html"
 
 
 docker exec -it my-web-v3 sh -c 'echo "<h1>Volume Persistence Success!</h1>" > /usr/share/nginx/html/index.html'
+
 ```
