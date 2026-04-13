@@ -25,14 +25,13 @@
 
  ## 3) 수행 로그(발췌)
 
-### 터미널 기본 조작 및 폴더 구성
+### 01 터미널 기본 조작 및 폴더 구성
 
 ```bash
 # 문서(Documents) 폴더 내에 프로젝트 폴더 생성
-mkdir -p ~/Documents/codyssey
-cd ~/Documents/codyssey
+mkdir -p ~/Documents/codyssey/
+cd ~/Documents/codyssey/
 ```
-
 
 
 ```bash
@@ -54,7 +53,9 @@ $ echo "Terminal Practice" > hello.txt
 $ cat hello.txt
 Terminal Practice
 ````
-### 권한 변경 실습
+
+### 02 권한 변경 실습
+
 
 ```bash
 $ ls -l
@@ -72,7 +73,7 @@ hello.txt
 -rwxr-xr-x  1 gdone90098008  gdone90098008  18 Apr  3 12:39 hello.txt
 ```
 
-### Docker 설치/점검
+### 03 Docker 설치/점검
 
 ```bash
 $ docker --version
@@ -178,7 +179,7 @@ WARNING: DOCKER_INSECURE_NO_IPTABLES_RAW is set
 ```
 ### hello-world 실행
 
-```
+```zsh
 $ docker run hello-world
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
@@ -245,6 +246,9 @@ $ docker ps -a
 CONTAINER ID   IMAGE         COMMAND    CREATED              STATUS                      PORTS     NAMES
 24bfc4a49ce7   ubuntu        "bash"     About a minute ago   Exited (0) 31 seconds ago             my-ubuntu
 b6372eb5bdc9   hello-world   "/hello"   2 minutes ago        Exited (0) 2 minutes ago              goofy_yonath
+
+# 기존 실행되어있는도커를 모두 종료한다.
+$ docker rm -f $(docker ps -aq)
 
 ```
 ### Dockerfile 빌드/실행
@@ -321,11 +325,63 @@ images 폴더 안에 화면캡춰 이미지 삽입
 
 <img src="images/Screenshot 2026-04-03 at 12.54.52 PM.png" alt="접속 결과" width="600">
 
+### 바인드 마운트 반영
 
 
-- [x] 바인드 마운트 반영
-- [x] 볼륨 영속성
-- [x] Git 설정 + VSCode GitHub 연동
+```zsh
+
+# 1. 폴더와 파일 준비
+mkdir -p ~/Documents/codyssey/codyssey-e1-1/practice/html
+echo '<h1>Bind Mount Success!</h1>' > ~/Documents/codyssey/codyssey-e1-1/practice/html/index.html
+
+# 2. 실행
+docker run -d -p 8080:80 --name my-web-server \
+-v ~/Documents/codyssey/codyssey-e1-1/practice/html:/usr/share/nginx/html \
+nginx:alpine
+
+# 에러시 기존 서버를 삭제
+docker rm -f my-web-server
+
+# 웹브라우저에서 접속 http://localhost:8080/
+
+```
+
+<img src="images/bindmountsuccess.png" alt="접속 결과" width="600">
+
+
+### 볼륨 영속성
+```zsh
+docker volume create my-web-data
+docker volume ls
+
+DRIVER    VOLUME NAME
+local     my-web-data
+
+# 경로가 아닌 볼륭을 장착하여 컨테이너 실행
+docker run -d -p 8082:80 --name my-web-v3 \
+-v my-web-data:/usr/share/nginx/html \
+nginx:alpine
+
+
+# 1. 컨테이너 내부 파일 수정 (임시로 문구 변경)
+docker exec -it my-web-v3 sh -c 'echo "<h1>Volume Persistence Success!</h1>" > /usr/share/nginx/html/index.html'
+
+# 2. 브라우저 확인: http://localhost:8082
+
+# 3. 서버 삭제 (컨테이너를 아예 없애버립니다)
+docker rm -f my-web-v3
+
+# 4. 똑같은 볼륨을 장착해서 다시 실행
+docker run -d -p 8082:80 --name my-web-v3 -v my-web-data:/usr/share/nginx/html nginx:alpine
+
+# 5. 다시 브라우저 확인: http://localhost:8082
+
+```
+<img src="images/volumesuccess.png" alt="접속 결과" width="600">
+
+
+### Git 설정 + VSCode GitHub 연동
+
 ```zsh
 # 1. 프로젝트 최상위 폴더로 이동합니다.
 cd ~/Documents/codyssey/codyssey-e1-1
@@ -377,3 +433,14 @@ CONTAINER ID   IMAGE        COMMAND                  CREATED              STATUS
 
 ```
 
+두번째 트러블슈팅
+전체 명령어를 감싸는 따옴표를 홀따옴표(' ')로 바꾸어서 해결
+
+'''zsh
+
+# 1. 컨테이너 내부 파일 수정 (임시로 문구 변경)
+docker exec -it my-web-v3 sh -c "echo '<h1>Volume Persistence Success!</h1>' > /usr/share/nginx/html/index.html"
+
+
+docker exec -it my-web-v3 sh -c 'echo "<h1>Volume Persistence Success!</h1>" > /usr/share/nginx/html/index.html'
+```
