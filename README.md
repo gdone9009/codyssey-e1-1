@@ -67,6 +67,27 @@ $ cd practice
 $ pwd
 /Users/gdone90098008/Documents/codyssey/codyssey-e1-1/practice
 
+# 이동, 생성, 복사, 이동/이름변경, 삭제
+$ mv hello.txt html/
+$ ls
+Dockerfile	html		index.html
+
+# 복사
+$ cp html/hello.txt .
+$ ls
+Dockerfile	hello.txt	html		index.html
+
+# 삭제
+$ rm hello.txt
+$ ls
+Dockerfile	html		index.html
+
+# 이름변경
+$ mv hello.txt hi.txt
+$ practice % ls
+Dockerfile	hi.txt		html		index.html
+$ practice % 
+
 # 빈 텍스트 파일을 생성하고 내용을 확인해봅니다.
 $ echo "Terminal Practice" > hello.txt
 $ cat hello.txt
@@ -388,9 +409,56 @@ docker run -d -p 8082:80 --name my-web-v3 \
 -v my-web-data:/usr/share/nginx/html \
 nginx:alpine
 
+# 컨테이너 종료/유지(attach/exec 등)의 차이를 스스로 관찰하고 간단히 정리한다.
 
 # 1. 컨테이너 내부 파일 수정 (임시로 문구 변경)
 docker exec -it my-web-v3 sh -c 'echo "<h1>Volume Persistence Success!</h1>" > /usr/share/nginx/html/index.html'
+
+# exec로 터미널 세션을 연결하지 않고, 새로운 명령을 실행한 결과만 확인.
+docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS              PORTS                                     NAMES
+ce6c5ca5dd33   nginx:alpine   "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:8082->80/tcp, [::]:8082->80/tcp   my-web-v3
+
+# attach 도커에서 실행 중인 컨테이너에 터미널 접속
+docker attach my-web-v3
+
+^C2026/04/15 12:46:33 [notice] 1#1: signal 2 (SIGINT) received, exiting
+2026/04/15 12:46:33 [notice] 35#35: exiting
+2026/04/15 12:46:33 [notice] 34#34: exiting
+2026/04/15 12:46:33 [notice] 31#31: exiting
+2026/04/15 12:46:33 [notice] 30#30: exiting
+2026/04/15 12:46:33 [notice] 33#33: exiting
+2026/04/15 12:46:33 [notice] 32#32: exiting
+2026/04/15 12:46:33 [notice] 30#30: exit
+2026/04/15 12:46:33 [notice] 35#35: exit
+2026/04/15 12:46:33 [notice] 34#34: exit
+2026/04/15 12:46:33 [notice] 31#31: exit
+2026/04/15 12:46:33 [notice] 33#33: exit
+2026/04/15 12:46:33 [notice] 32#32: exit
+2026/04/15 12:46:33 [notice] 1#1: signal 17 (SIGCHLD) received from 32
+2026/04/15 12:46:33 [notice] 1#1: worker process 32 exited with code 0
+2026/04/15 12:46:33 [notice] 1#1: signal 29 (SIGIO) received
+2026/04/15 12:46:33 [notice] 1#1: signal 17 (SIGCHLD) received from 30
+2026/04/15 12:46:33 [notice] 1#1: worker process 30 exited with code 0
+2026/04/15 12:46:33 [notice] 1#1: worker process 33 exited with code 0
+2026/04/15 12:46:33 [notice] 1#1: signal 29 (SIGIO) received
+2026/04/15 12:46:33 [notice] 1#1: signal 17 (SIGCHLD) received from 34
+2026/04/15 12:46:33 [notice] 1#1: worker process 34 exited with code 0
+2026/04/15 12:46:33 [notice] 1#1: signal 29 (SIGIO) received
+2026/04/15 12:46:33 [notice] 1#1: signal 17 (SIGCHLD) received from 35
+2026/04/15 12:46:33 [notice] 1#1: worker process 35 exited with code 0
+2026/04/15 12:46:33 [notice] 1#1: signal 29 (SIGIO) received
+2026/04/15 12:46:33 [notice] 1#1: signal 17 (SIGCHLD) received from 31
+2026/04/15 12:46:33 [notice] 1#1: worker process 31 exited with code 0
+2026/04/15 12:46:33 [notice] 1#1: exit
+
+# attach로 접속하로 ctrl+c로 exit하면 콘테이너가 종료된 것을 확인함.
+docker ps 
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+
+# 에러시 기존 서버를 삭제
+docker rm -f my-web-v3
 
 # 2. 브라우저 확인: http://localhost:8082
 
