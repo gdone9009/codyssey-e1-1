@@ -24,6 +24,9 @@
 - [x] Git 설정 + VSCode GitHub 연동
 
 ## 4. 프로젝트 구조
+루트폴더(.)에 설명서와 도커파일 및 실행에 필수적인 파일들을 넣어두었고,
+일부 실행화면 캡춰는 images폴더에 담아 설명서에 추가하였고,
+코드 연습을 위하여 practice폴더를 만들었습니다.
 
 ```bash
 .
@@ -55,6 +58,7 @@ cd ~/Documents/codyssey/
 
 ```bash
 # 현재 위치를 확인하고 폴더를 생성합니다.
+# pwd를 통하여 나타난 경로가 절대경로입니다. 상대경로는 나의 현재위치(.)를 기준으로 하위폴더는 폴더명을 기입하고, 상위폴더는 ..으로 이동하여 경로를 표시합니다. 바인드마운트처럼 도커외부의 컴퓨텉자원을 활용할때는 절대경로를 사용하고, 도커 컨테이너 내부의 리소스를 사용할때는 상대경로를 사용하는게 좋습니다.
 $ pwd
 /Users/gdone90098008/Documents/codyssey
 
@@ -96,7 +100,7 @@ Terminal Practice
 
 ### 02 권한 변경 실습
 권한은 읽기(4), 쓰기(2), 실행(1)의 합
-
+# 10자리중 첫번째는 폴더여부, 다음3개는 소유자의 권한이며, 다음3개는 소유자가포함된그룹, 마지막3개는 나머지 기타 사용자의 파일 권한을 의미합니다.
 
 ```bash
 $ ls -l
@@ -295,6 +299,7 @@ $ docker rm -f $(docker ps -aq)
 ### Dockerfile 빌드/실행
 빌드(Build): Dockerfile을 통해 생성된 이미지는 애플리케이션 실행에 필요한 모든 환경이 압축된 '읽기 전용(Read-Only)' 설계도
 실행(Run): 이 이미지를 기반으로 메모리 위에 생성된 실체가 컨테이너입니다. 이미지가 클래스라면 컨테이너는 인스턴스
+따라서, 이미지는 변경이 안되고, 이미지를 바탕으로 실행된 컨테이너는 변경사항이 저장됩니다.
 
 ```zsh
 $ echo "<h1>Welcome to GangdongOne's Web Server</h1>" > index.html
@@ -353,6 +358,10 @@ my-web        1.0       4171d94cebff   5 seconds ago   62.2MB
 hello-world   latest    e2ac70e7319a   10 days ago     10.1kB
 ubuntu        latest    f794f40ddfff   5 weeks ago     78.1MB
 
+# 웹서버를 도커 컨테이너를 실행시키며, 도커 내부 웹서버 기본포트인 80포트와 도커 외부의 브라우저 접속용 포트는 임의의 8080포트를 지정하여 서로 매핑하엿습니다. 따라서 브라우저는 https:/localhost:8080 으로 접속하지만, 곧 도커의 웹서버 컨테이너 80으로 접속이 이어집니다.
+# 도커 내부에는 별도의 독립적이 폐쇄적인 네트워크가 실행되고 있으므로, 포트 포워딩을 통하여 매핑되어야 비로소 외부 네트워크와 연결되어 통신이 가능합니다.
+
+
 $ docker run -d -p 8080:80 --name my-web-server my-web:1.0
 72efead3e43c35aa8f586838395394fd5588991f107cfa5c5a75db9e55568004
 
@@ -404,7 +413,7 @@ docker volume ls
 DRIVER    VOLUME NAME
 local     my-web-data
 
-# 경로가 아닌 볼륭을 장착하여 컨테이너 실행
+# 경로가 아닌 볼륨을 장착하여 컨테이너 실행
 docker run -d -p 8082:80 --name my-web-v3 \
 -v my-web-data:/usr/share/nginx/html \
 nginx:alpine
